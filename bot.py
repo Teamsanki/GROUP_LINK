@@ -11,10 +11,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Replace this with your bot's token from BotFather
-TELEGRAM_TOKEN = "7894936433:AAGB6DUCC13t_a9I5YaBTk_3-xpuiH5mNiU"
+TELEGRAM_TOKEN = "your_bot_token"
 
 # MongoDB URL
-MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"  # e.g., mongodb://localhost:27017/
+MONGO_URL = "mongodb://localhost:27017/"  # MongoDB connection string
 
 # Replace this with your logger group chat ID (it should be negative for groups)
 LOGGER_GROUP_CHAT_ID = "-1002100433415"  # Example: @loggroupname or chat_id
@@ -36,10 +36,6 @@ bot_start_time = datetime.now()
 def increment_user_count(user_id):
     users_collection.update_one({"user_id": user_id}, {"$set": {"user_id": user_id}}, upsert=True)
 
-# Function to get the total number of unique users
-def get_user_count():
-    return users_collection.count_documents({})
-
 # Function to calculate uptime
 def get_uptime():
     delta = datetime.now() - bot_start_time
@@ -50,8 +46,6 @@ def get_uptime():
 
 async def start(update: Update, context: CallbackContext) -> None:
     """Sends an attractive welcome message with a photo when the bot is started, and logs to the logger group."""
-
-    # Attractive welcome message with a photo
     welcome_text = (
         "*🎉 Welcome to Our Bot, {user_name}! 🎉*\n\n"
         "Hello, *{user_name}* 👋\n\n"
@@ -106,8 +100,8 @@ async def addgc(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text(f"Group link added: {group_link}")
 
 async def getpvt(update: Update, context: CallbackContext) -> None:
-    """Fetches the latest 10 private group links."""
-    group_links = private_groups_collection.find().sort("_id", -1).limit(10)
+    """Fetches all private group links (both user-added and owner-added)."""
+    group_links = private_groups_collection.find().sort("_id", -1)  # Fetch all group links sorted by most recent
 
     if group_links.count() > 0:
         links_message = "Here are the latest private group links:\n"
@@ -132,9 +126,8 @@ async def help_command(update: Update, context: CallbackContext) -> None:
     help_text = (
         "Here are the available commands:\n\n"
         "/start - Start the bot\n"
-        "/getpvt - Get the latest 10 private group links\n"
+        "/getpvt - Get the latest private group links\n"
         "/help - Show this help message"
-        "/ping - Show bot start time"
     )
     await update.message.reply_text(help_text)
 
