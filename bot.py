@@ -20,7 +20,7 @@ OWNER_TELEGRAM_ID = "7877197608"  # Example: "123456789" or "@username"
 
 # GitHub repository details
 GITHUB_REPO_DIR = '/path/to/your/bot/repo'  # Path to the bot's repo directory on the server
-GITHUB_REPO_URL = 'https://github.com/yourusername/yourrepo.git'
+GITHUB_REPO_URL = 'https://github.com/Teamsanki/GROUP_LINK.git'
 
 async def start(update: Update, context: CallbackContext) -> None:
     """Sends a welcome message when the bot is started, logs to the logger group, and sends an inline keyboard with the support channel and owner's Telegram ID."""
@@ -31,8 +31,8 @@ async def start(update: Update, context: CallbackContext) -> None:
 
     # Create an inline keyboard with a link to the owner's support channel and owner's Telegram ID
     keyboard = [
-        [InlineKeyboardButton("Contact Support", url=OWNER_SUPPORT_CHANNEL)],
-        [InlineKeyboardButton("Message Owner", url=f"tg://user?id={OWNER_TELEGRAM_ID}")]
+        [InlineKeyboardButton("𝐂𝐇𝐀𝐍𝐍𝐄𝐋", url=OWNER_SUPPORT_CHANNEL)],
+        [InlineKeyboardButton("𝐒𝐀𝐍𝐊𝐈 𝐗𝐃", url=f"tg://user?id={OWNER_TELEGRAM_ID}")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
