@@ -25,7 +25,7 @@ OWNER_TELEGRAM_ID = "7877197608"  # Example: "123456789" or "@username"
 
 # GitHub repository details
 GITHUB_REPO_DIR = '/path/to/your/bot/repo'  # Path to the bot's repo directory on the server
-GITHUB_REPO_URL = 'https://github.com/yourusername/yourrepo.git'
+GITHUB_REPO_URL = 'https://github.com/Teamsanki/GROUP_LINK.git'
 
 # MongoDB Client and Database
 client = MongoClient(MONGO_URL)
