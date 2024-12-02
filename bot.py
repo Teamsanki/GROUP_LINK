@@ -61,7 +61,7 @@ async def start(update: Update, context: CallbackContext) -> None:
     ).format(user_name=update.message.from_user.first_name)
 
     # Send welcome message with photo and Markdown formatting
-    photo_url = "https://example.com/photo.jpg"  # Replace with actual photo URL
+    photo_url = "https://graph.org/file/6c0db28a848ed4dacae56-93b1bc1873b2494eb2.jpg"  # Replace with actual photo URL
     media = InputMediaPhoto(media=photo_url, caption=welcome_text, parse_mode='Markdown')
     await update.message.reply_media_group([media])
 
@@ -128,29 +128,15 @@ async def reset(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text("All group links have been reset.")
 
 async def help_command(update: Update, context: CallbackContext) -> None:
-    """Shows available commands to the user with inline keyboard."""
-
-    # Inline keyboard for help
-    keyboard = [
-        [InlineKeyboardButton("Start the Bot", callback_data="/start")],
-        [InlineKeyboardButton("Get Private Group Links", callback_data="/getpvt")],
-        [InlineKeyboardButton("Add Group Link (Owner Only)", callback_data="/addgc")],
-        [InlineKeyboardButton("Reset Group Links (Owner Only)", callback_data="/reset")],
-        [InlineKeyboardButton("Help", callback_data="/help")]
-    ]
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
+    """Shows available commands to the user, excluding owner-only commands."""
     help_text = (
         "Here are the available commands:\n\n"
         "/start - Start the bot\n"
         "/getpvt - Get the latest 10 private group links\n"
-        "/addgc <group_link> - (Owner only) Add a private group link\n"
-        "/reset - (Owner only) Reset (delete) all private group links\n"
         "/help - Show this help message"
+        "/ping - Show bot start time
     )
-    
-    await update.message.reply_text(help_text, reply_markup=reply_markup)
+    await update.message.reply_text(help_text)
 
 async def ping(update: Update, context: CallbackContext) -> None:
     """Respond with the bot's uptime."""
