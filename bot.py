@@ -63,7 +63,7 @@ async def start(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id  # User's ID
 
     # Prepare the log message
-    log_message = f"User {user_name} (Username: @{user_username if user_username else 'No Username'}, ID: {user_id}) has started the bot."
+    log_message = f"◈𝐍𝐀𝐌𝐄 {user_name} \n\n(◈𝐔𝐒𝐄𝐑𝐍𝐀𝐌𝐄: @{user_username if user_username else 'No Username'}, \n\n◈𝐈𝐃: {user_id}) ʜᴀs sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ"
     
     # Send the log message to the logger group
     await context.bot.send_message(chat_id=LOGGER_GROUP_CHAT_ID, text=log_message)
