@@ -1,4 +1,5 @@
 import logging
+import subprocess
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackContext
 
@@ -16,6 +17,10 @@ LOGGER_GROUP_CHAT_ID = "-1002100433415"  # Example: @loggroupname or chat_id
 # Replace with your support channel link and owner's Telegram ID
 OWNER_SUPPORT_CHANNEL = "https://t.me/matalbi_duniya"
 OWNER_TELEGRAM_ID = "7877197608"  # Example: "123456789" or "@username"
+
+# GitHub repository details
+GITHUB_REPO_DIR = '/path/to/your/bot/repo'  # Path to the bot's repo directory on the server
+GITHUB_REPO_URL = 'https://github.com/yourusername/yourrepo.git'
 
 async def start(update: Update, context: CallbackContext) -> None:
     """Sends a welcome message when the bot is started, logs to the logger group, and sends an inline keyboard with the support channel and owner's Telegram ID."""
@@ -45,11 +50,25 @@ async def start(update: Update, context: CallbackContext) -> None:
     # Send the log message to the logger group
     await context.bot.send_message(chat_id=LOGGER_GROUP_CHAT_ID, text=log_message)
 
-async def get_group_link(update: Update, context: CallbackContext) -> None:
-    """Fetches the group link based on chat ID."""
-    chat_id = update.message.text.strip()
-    group_link = f"https://t.me/{chat_id}"  # Placeholder for the actual group link logic
-    await update.message.reply_text(f"The latest link for your group: {group_link}")
+async def update_bot(update: Update, context: CallbackContext) -> None:
+    """Pull the latest changes from the GitHub repository and restart the bot."""
+    if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
+        await update.message.reply_text("Sorry, you don't have permission to update the bot.")
+        return
+
+    # Send a message saying the bot is updating
+    await update.message.reply_text("Updating the bot to the latest version...")
+
+    try:
+        # Pull the latest changes from the GitHub repository
+        subprocess.run(['git', '-C', GITHUB_REPO_DIR, 'pull'], check=True)
+        
+        # Restart the bot by running the same Python script
+        subprocess.run(['python3', 'bot.py'], check=True)  # This will restart the bot
+        
+        await update.message.reply_text("Bot has been updated and restarted successfully!")
+    except Exception as e:
+        await update.message.reply_text(f"Error during update: {str(e)}")
 
 async def help_command(update: Update, context: CallbackContext) -> None:
     """Shows available commands to the user."""
@@ -57,6 +76,7 @@ async def help_command(update: Update, context: CallbackContext) -> None:
         "Here are the available commands:\n\n"
         "/start - Start the bot\n"
         "/getgroup <chat_id> - Get the link for your group\n"
+        "/update - Update and restart the bot (Owner Only)\n"
         "/help - Show this help message"
     )
     await update.message.reply_text(help_text)
@@ -68,8 +88,8 @@ def main():
 
     # Add command handlers
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("getgroup", get_group_link))
-    application.add_handler(CommandHandler("help", help_command))  # Added help command
+    application.add_handler(CommandHandler("update", update_bot))  # Add the update command
+    application.add_handler(CommandHandler("help", help_command))
 
     # Start the Bot
     application.run_polling()
