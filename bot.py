@@ -134,7 +134,7 @@ async def help_command(update: Update, context: CallbackContext) -> None:
         "/start - Start the bot\n"
         "/getpvt - Get the latest 10 private group links\n"
         "/help - Show this help message"
-        "/ping - Show bot start time
+        "/ping - Show bot start time"
     )
     await update.message.reply_text(help_text)
 
