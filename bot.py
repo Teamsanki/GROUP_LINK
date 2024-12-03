@@ -122,6 +122,21 @@ async def getpvt(update: Update, context: CallbackContext) -> None:
     else:
         await update.message.reply_text("No private group links available yet. Please try again later.")
 
+async def help_command(update: Update, context: CallbackContext) -> None:
+    """Shows available commands to the user."""
+    help_text = (
+        "Here are the available commands:\n\n"
+        "/start - Start the bot\n"
+        "/getpvt - Get a random private group link\n"
+        "/help - Show this help message"
+    )
+    await update.message.reply_text(help_text)
+
+async def ping(update: Update, context: CallbackContext) -> None:
+    """Respond with the bot's uptime."""
+    uptime = get_uptime()
+    await update.message.reply_text(f"Bot Uptime: {uptime}")
+
 def main():
     """Start the bot."""
     application = Application.builder().token(TELEGRAM_TOKEN).build()
