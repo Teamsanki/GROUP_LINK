@@ -1,10 +1,10 @@
 # Telegram Bot
 
-This is a simple Telegram bot that logs users' details (name, username, and user ID) to a specific logger group whenever a user starts the bot. It also provides a `/getgroup` command to fetch group links.
+This is a simple Telegram bot that logs users' details (name, username, and user ID) to a specific logger group whenever a user starts the bot. It also provides a `/getpvt` command to fetch group links.
 
 ## Features:
 - Logs user details (name, username, user ID) to a logger group when the bot is started.
-- Provides a `/getgroup` command to get a group link.
+- Provides a `/getpvt` command to get a group link.
 
 ## Requirements:
 - Python 3.9+
