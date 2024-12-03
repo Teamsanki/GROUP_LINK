@@ -18,7 +18,7 @@ TELEGRAM_TOKEN = "7894936433:AAGB6DUCC13t_a9I5YaBTk_3-xpuiH5mNiU"
 MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 # Logger Group Chat ID
-LOGGER_GROUP_CHAT_ID = -1002148651992  # Replace with your logger group chat ID
+LOGGER_GROUP_CHAT_ID = -1002100433415  # Replace with your logger group chat ID
 
 # Owner Information
 OWNER_SUPPORT_CHANNEL = "https://t.me/matalbi_duniya"
