@@ -4,6 +4,7 @@ from telegram.ext import Application, CommandHandler, CallbackContext
 import os
 from pymongo import MongoClient
 from datetime import datetime
+import random
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -14,14 +15,14 @@ logger = logging.getLogger(__name__)
 TELEGRAM_TOKEN = "7894936433:AAGB6DUCC13t_a9I5YaBTk_3-xpuiH5mNiU"
 
 # MongoDB URL
-MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"  # MongoDB URL
+MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 # Replace this with your logger group chat ID (it should be negative for groups)
-LOGGER_GROUP_CHAT_ID = "-1002100433415"  # Example: @loggroupname or chat_id
+LOGGER_GROUP_CHAT_ID = "-1002100433415"
 
 # Replace with your support channel link and owner's Telegram ID
 OWNER_SUPPORT_CHANNEL = "https://t.me/matalbi_duniya"
-OWNER_TELEGRAM_ID = "7877197608"  # Example: "123456789" or "@username"
+OWNER_TELEGRAM_ID = "7877197608"
 
 # MongoDB Client and Database
 client = MongoClient(MONGO_URL)
@@ -35,10 +36,6 @@ bot_start_time = datetime.now()
 # Function to increment the user count in MongoDB
 def increment_user_count(user_id):
     users_collection.update_one({"user_id": user_id}, {"$set": {"user_id": user_id}}, upsert=True)
-
-# Function to get the total number of unique users
-def get_user_count():
-    return users_collection.count_documents({})
 
 # Function to calculate uptime
 def get_uptime():
@@ -110,52 +107,29 @@ async def addgc(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text(f"Failed to add the group link. Error: {e}")
 
 async def getpvt(update: Update, context: CallbackContext) -> None:
-    """Fetches the latest 10 private group links."""
-    group_links = private_groups_collection.find().sort("_id", -1).limit(10)
+    """Fetches a random private group link from the owner's collection."""
 
-    if group_links.count() > 0:
-        links_message = "Here are the latest private group links:\n"
-        for idx, link in enumerate(group_links, 1):
-            links_message += f"{idx}. {link['link']}\n"
-        await update.message.reply_text(links_message)
+    # Fetch all private group links from MongoDB
+    group_links = private_groups_collection.find()
+
+    # Convert the cursor to a list to randomly select a link
+    group_links_list = list(group_links)
+
+    if len(group_links_list) > 0:
+        # Randomly select a group link from the list
+        random_group_link = random.choice(group_links_list)
+        await update.message.reply_text(f"Here is a random private group link for you: {random_group_link['link']}")
     else:
-        await update.message.reply_text("Be patient! Latest link is coming soon.")
-
-async def reset(update: Update, context: CallbackContext) -> None:
-    """Owner-only command to reset (delete) all private group links."""
-    if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
-        await update.message.reply_text("This command is restricted to the owner only.")
-        return
-
-    private_groups_collection.delete_many({})  # Delete all group links
-
-    await update.message.reply_text("All group links have been reset.")
-
-async def help_command(update: Update, context: CallbackContext) -> None:
-    """Shows available commands to the user, excluding owner-only commands."""
-    help_text = (
-        "Here are the available commands:\n\n"
-        "/start - Start the bot\n"
-        "/getpvt - Get the latest 10 private group links\n"
-        "/help - Show this help message"
-    )
-    await update.message.reply_text(help_text)
-
-async def ping(update: Update, context: CallbackContext) -> None:
-    """Respond with the bot's uptime."""
-    uptime = get_uptime()
-    await update.message.reply_text(f"Bot Uptime: {uptime}")
+        await update.message.reply_text("No private group links available yet. Please try again later.")
 
 def main():
     """Start the bot."""
-    # Use the new Application class to replace the old Updater class
     application = Application.builder().token(TELEGRAM_TOKEN).build()
 
     # Add command handlers
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("addgc", addgc))  # Command to add a private group link
     application.add_handler(CommandHandler("getpvt", getpvt))  # Command to get private group links
-    application.add_handler(CommandHandler("reset", reset))  # Command to reset private group links
     application.add_handler(CommandHandler("help", help_command))  # Command for showing help
     application.add_handler(CommandHandler("ping", ping))  # Command for checking uptime
 
