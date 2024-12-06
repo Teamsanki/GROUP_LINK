@@ -302,27 +302,31 @@ async def broadcast(update: Update, context: CallbackContext) -> None:
     blocked_users = 0
 
     # Send broadcast message to all users
-all_users = users_collection.find()
-for user in all_users:
-    total_users += 1
-    try:
-        await context.bot.send_message(user['user_id'], message)
-        successful_sends += 1
-    except Exception as e:
-        # Log the error and assume the user is blocked
-        logger.error(f"Error sending message to user {user['user_id']}: {e}")
-        blocked_users += 1
+    all_users = users_collection.find()
+    for user in all_users:
+        total_users += 1
+        try:
+            await context.bot.send_message(user['user_id'], message)
+            successful_sends += 1
+        except Exception as e:
+            # Log the error and assume the user is blocked or there was an issue
+            blocked_users += 1
+            logger.error(f"Error sending message to user {user['user_id']}: {e}")
 
-# Send summary to the owner
-await update.message.reply_text(f"Broadcast completed: {successful_sends}/{total_users} users successfully contacted. {blocked_users} users were blocked.")
-
-    # Send a summary message to the owner
-    await update.message.reply_text(
-        f"Broadcast complete!\n\n"
-        f"Total users: {total_users}\n"
-        f"Successfully sent: {successful_sends}\n"
-        f"Blocked or failed: {blocked_users}"
+    # After broadcasting, send a summary message to the owner
+    success_rate = (successful_sends / total_users) * 100 if total_users else 0
+    summary_message = (
+        f"Broadcast Summary:\n"
+        f"Total Users: {total_users}\n"
+        f"Messages Sent Successfully: {successful_sends}\n"
+        f"Blocked Users (or errors): {blocked_users}\n"
+        f"Success Rate: {success_rate:.2f}%"
     )
+    
+    try:
+        await update.message.reply_text(summary_message)
+    except Exception as e:
+        logger.error(f"Error sending summary to owner: {e}")
 
 
 async def blckdel(update: Update, context: CallbackContext) -> None:
