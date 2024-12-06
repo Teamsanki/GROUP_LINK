@@ -29,6 +29,7 @@ client = MongoClient(MONGO_URL)
 db = client['bot_database']
 users_collection = db['users']
 private_groups_collection = db['private_groups']
+public_groups_collection = db['public_groups']  # New collection for public groups
 requests_collection = db['requests']  # To store user requests
 
 # Bot start time (used for uptime calculation)
@@ -174,7 +175,7 @@ def is_valid_url(url):
 user_last_getpvt_time = {}
 
 async def getpvt(update: Update, context: CallbackContext) -> None:
-    """Fetches random private group links with a 5-second delay for repeated use."""
+    """Fetches random private group links with a 10-second delay for repeated use."""
     user_id = update.message.from_user.id
     current_time = datetime.now()
 
@@ -183,7 +184,7 @@ async def getpvt(update: Update, context: CallbackContext) -> None:
         last_used_time = user_last_getpvt_time[user_id]
         time_diff = (current_time - last_used_time).total_seconds()
 
-        # If the command is used within 5 seconds, send a delay message
+        # If the command is used within 10 seconds, send a delay message
         if time_diff < 10:
             await update.message.reply_text(
                 f"⚠️ Please wait {10 - int(time_diff)} seconds before using this command again."
@@ -193,7 +194,7 @@ async def getpvt(update: Update, context: CallbackContext) -> None:
     # Update the last used time for the user
     user_last_getpvt_time[user_id] = current_time
 
-    # Fetch all group links from the database
+    # Fetch all private group links from the database
     group_links = private_groups_collection.find()
     group_links_list = list(group_links)
 
@@ -227,6 +228,61 @@ async def getpvt(update: Update, context: CallbackContext) -> None:
             "Nᴏ ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ ʟɪɴᴋs ᴀᴠᴀɪʟᴀʙʟᴇ ʏᴇᴛ. Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ"
         )
 
+
+async def getpublic(update: Update, context: CallbackContext) -> None:
+    """Fetches random public group links with a 10-second delay for repeated use."""
+    user_id = update.message.from_user.id
+    current_time = datetime.now()
+
+    # Check if the user has used the command before
+    if user_id in user_last_getpublic_time:
+        last_used_time = user_last_getpublic_time[user_id]
+        time_diff = (current_time - last_used_time).total_seconds()
+
+        # If the command is used within 10 seconds, send a delay message
+        if time_diff < 10:
+            await update.message.reply_text(
+                f"⚠️ Please wait {10 - int(time_diff)} seconds before using this command again."
+            )
+            return
+
+    # Update the last used time for the user
+    user_last_getpublic_time[user_id] = current_time
+
+    # Fetch all public group links from the database
+    group_links = public_groups_collection.find()
+    group_links_list = list(group_links)
+
+    # Filter out invalid links
+    valid_links = [link for link in group_links_list if is_valid_url(link.get('link', ''))]
+
+    if len(valid_links) > 0:
+        # Ensure we only sample the number of links available
+        sample_size = min(10, len(valid_links))
+        random_links = random.sample(valid_links, sample_size)
+
+        # Dynamically create the keyboard based on the number of links
+        keyboard = []
+        for i in range(0, len(random_links), 5):  # Create rows with 5 buttons each
+            row = [
+                InlineKeyboardButton(f"Puʙʟɪᴄ Gᴄ{i + j + 1}", url=random_links[i + j]['link'])
+                for j in range(min(5, len(random_links) - i))
+            ]
+            keyboard.append(row)
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await update.message.reply_text(
+            "Tʜɪs ɪs Tʜᴇ 𝟷𝟶 ʀᴀɴᴅᴏᴍ ᴘᴜʙʟɪᴄ ɢʀᴏᴜᴘ ʟɪɴᴋs\n\n"
+            "Nᴏᴛᴇ ᴀғᴛᴇʀ 𝟷𝟶 sᴇᴄ ᴛʜᴇɴ ᴜsᴇ /getpublic ᴄᴏᴍᴍᴀɴᴅ\n\n"
+            "Bᴇᴄᴀᴜsᴇ ᴏғ Tᴇᴀᴍ Sᴀɴᴋɪ ᴘᴏʟɪᴄʏ",
+            reply_markup=reply_markup
+        )
+    else:
+        await update.message.reply_text(
+            "Nᴏ ᴘᴜʙʟɪᴄ ɢʀᴏᴜᴘ ʟɪɴᴋs ᴀᴠᴀɪʟᴀʙʟᴇ ʏᴇᴛ. Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ"
+        )
+
 async def broadcast(update: Update, context: CallbackContext) -> None:
     """Owner-only command to send a broadcast message to all users."""
     if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
@@ -240,15 +296,58 @@ async def broadcast(update: Update, context: CallbackContext) -> None:
 
     message = " ".join(context.args)
 
+    # Variables to track success and blocked users
+    total_users = 0
+    successful_sends = 0
+    blocked_users = 0
+
     # Send broadcast message to all users
     all_users = users_collection.find()
     for user in all_users:
+        total_users += 1
         try:
             await context.bot.send_message(user['user_id'], message)
+            successful_sends += 1
         except Exception as e:
+            # Log the error and assume the user has blocked the bot
+            blocked_users += 1
             logger.error(f"Error sending message to {user['user_id']}: {e}")
 
-    await update.message.reply_text("Broadcast message sent to all users.")
+    # Send a summary message to the owner
+    await update.message.reply_text(
+        f"Broadcast complete!\n\n"
+        f"Total users: {total_users}\n"
+        f"Successfully sent: {successful_sends}\n"
+        f"Blocked or failed: {blocked_users}"
+    )
+
+
+async def blckdel(update: Update, context: CallbackContext) -> None:
+    """Owner-only command to delete users who have blocked the bot."""
+    if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
+        await update.message.reply_text("This command is restricted to the owner only.")
+        return
+
+    # Track the number of blocked users removed
+    removed_count = 0
+
+    # Iterate through all users and check if the bot is blocked
+    all_users = users_collection.find()
+    for user in all_users:
+        try:
+            # Test if the bot can send a message
+            await context.bot.send_chat_action(user['user_id'], "typing")
+        except Exception as e:
+            # Assume the user has blocked the bot and delete from database
+            users_collection.delete_one({'user_id': user['user_id']})
+            removed_count += 1
+            logger.info(f"Removed blocked user: {user['user_id']} due to {e}")
+
+    # Notify the owner of the cleanup
+    await update.message.reply_text(
+        f"Cleanup complete!\n\n"
+        f"Removed {removed_count} users who had blocked the bot."
+    )
 
 async def stats(update: Update, context: CallbackContext) -> None:
     """Owner-only command to view bot statistics."""
@@ -265,6 +364,9 @@ async def stats(update: Update, context: CallbackContext) -> None:
     # Get the number of private groups in the database
     group_count = private_groups_collection.count_documents({})
 
+    # Get the number of public groups in the database
+    group_countpl = public_groups_collection.count_documents({})
+
     # Get uptime of the bot
     uptime = get_uptime()
 
@@ -274,8 +376,9 @@ async def stats(update: Update, context: CallbackContext) -> None:
         f"◈ Total number of users: {user_count}\n"
         f"◈ Total number of requests: {request_count}\n"
         f"◈ Total number of private groups: {group_count}\n"
+        f"◈ Total number of public groups: {group_countpl}\n"
         f"◈ Uptime: {uptime}\n\n"
-        "*Keep up the great work! 🚀*"
+        "*Keep up the great work! 🚀* [Team Sanki](https://t.me/matalbi_duniya)"
     )
     # Send the statistics message
     await update.message.reply_text(stats_message)
@@ -292,12 +395,125 @@ async def addgc(update: Update, context: CallbackContext) -> None:
 
     group_link = context.args[0]
 
-    # Insert the group link into MongoDB
+    # Insert the private group link into MongoDB
     try:
         private_groups_collection.insert_one({"link": group_link})
-        await update.message.reply_text(f"Group link added: {group_link}")
+        await update.message.reply_text(f"Private group link added: {group_link}")
     except Exception as e:
         await update.message.reply_text(f"Failed to add the group link. Error: {e}")
+
+
+async def delgc(update: Update, context: CallbackContext) -> None:
+    """Owner-only command to delete a private group link."""
+    if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
+        await update.message.reply_text("This command is restricted to the owner only.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Please provide the private group link to delete. Usage: /delgc <group_link>")
+        return
+
+    group_link = context.args[0]
+
+    # Delete the private group link from MongoDB
+    try:
+        result = private_groups_collection.delete_one({"link": group_link})
+        if result.deleted_count > 0:
+            await update.message.reply_text(f"Private group link deleted: {group_link}")
+        else:
+            await update.message.reply_text("The provided group link was not found.")
+    except Exception as e:
+        await update.message.reply_text(f"Failed to delete the group link. Error: {e}")
+
+
+async def addpl(update: Update, context: CallbackContext) -> None:
+    """Owner-only command to add a public group link."""
+    if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
+        await update.message.reply_text("This command is restricted to the owner only.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Please provide the public group link. Usage: /addpl <group_link>")
+        return
+
+    group_link = context.args[0]
+
+    # Insert the public group link into MongoDB
+    try:
+        public_groups_collection.insert_one({"link": group_link})
+        await update.message.reply_text(f"Public group link added: {group_link}")
+    except Exception as e:
+        await update.message.reply_text(f"Failed to add the group link. Error: {e}")
+
+
+async def delpl(update: Update, context: CallbackContext) -> None:
+    """Owner-only command to delete a public group link."""
+    if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
+        await update.message.reply_text("This command is restricted to the owner only.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Please provide the public group link to delete. Usage: /delpl <group_link>")
+        return
+
+    group_link = context.args[0]
+
+    # Delete the public group link from MongoDB
+    try:
+        result = public_groups_collection.delete_one({"link": group_link})
+        if result.deleted_count > 0:
+            await update.message.reply_text(f"Public group link deleted: {group_link}")
+        else:
+            await update.message.reply_text("The provided group link was not found.")
+    except Exception as e:
+        await update.message.reply_text(f"Failed to delete the group link. Error: {e}")
+    async def shift(update: Update, context: CallbackContext) -> None:
+    """Owner-only command to shift links between public and private group collections."""
+    if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
+        await update.message.reply_text("This command is restricted to the owner only.")
+        return
+
+    # Find all links in both collections
+    private_group_links = private_groups_collection.find()
+    public_group_links = public_groups_collection.find()
+
+    # Counters for shifted links
+    shifted_to_private = 0
+    shifted_to_public = 0
+
+    # Loop through private group links and check if any public links are incorrectly placed there
+    for link in private_group_links:
+        if is_valid_url(link.get('link', '')):
+            # Check if the link should be in the public group collection
+            if not is_valid_public_group(link['link']):
+                try:
+                    # Move the link to the public group collection
+                    public_groups_collection.insert_one({"link": link['link']})
+                    private_groups_collection.delete_one({"link": link['link']})
+                    shifted_to_public += 1
+                except Exception as e:
+                    await update.message.reply_text(f"Error while shifting link: {e}")
+
+    # Loop through public group links and check if any private links are incorrectly placed there
+    for link in public_group_links:
+        if is_valid_url(link.get('link', '')):
+            # Check if the link should be in the private group collection
+            if not is_valid_private_group(link['link']):
+                try:
+                    # Move the link to the private group collection
+                    private_groups_collection.insert_one({"link": link['link']})
+                    public_groups_collection.delete_one({"link": link['link']})
+                    shifted_to_private += 1
+                except Exception as e:
+                    await update.message.reply_text(f"Error while shifting link: {e}")
+
+    # Final message after shifting links
+    if shifted_to_private > 0 or shifted_to_public > 0:
+        await update.message.reply_text(f"Shifting complete!\n"
+                                       f"Total links shifted to private collection: {shifted_to_private}\n"
+                                       f"Total links shifted to public collection: {shifted_to_public}")
+    else:
+        await update.message.reply_text("No links needed shifting. Both collections are correct.")
   
 def main():
     application = Application.builder().token(TELEGRAM_TOKEN).build()
@@ -311,6 +527,11 @@ def main():
     application.add_handler(CommandHandler("for", for_command))
     application.add_handler(CommandHandler("stats", stats))
     application.add_handler(CommandHandler("addgc", addgc))
+    application.add_handler(CommandHandler("addpublic", addpublic))
+    application.add_handler(CommandHandler("getpublic", getpublic))
+    application.add_handler(CommandHandler("delpl", delpl))
+    application.add_handler(CommandHandler("delgc", delgc))
+    application.add_handler(CommandHandler("shift", shift))
 
     # Run the bot
     application.run_polling()
