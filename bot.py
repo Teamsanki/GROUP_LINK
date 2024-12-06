@@ -302,16 +302,19 @@ async def broadcast(update: Update, context: CallbackContext) -> None:
     blocked_users = 0
 
     # Send broadcast message to all users
-    all_users = users_collection.find()
-    for user in all_users:
-        total_users += 1
-        try:
-            await context.bot.send_message(user['user_id'], message)
-            successful_sends += 1
-        except Exception as e:
-            # Log the error and assume the user has blocked the bot
-            blocked_users += 1
-            logger.error(f"Error sending message to {user['user_id']}: {e}")
+all_users = users_collection.find()
+for user in all_users:
+    total_users += 1
+    try:
+        await context.bot.send_message(user['user_id'], message)
+        successful_sends += 1
+    except Exception as e:
+        # Log the error and assume the user is blocked
+        logger.error(f"Error sending message to user {user['user_id']}: {e}")
+        blocked_users += 1
+
+# Send summary to the owner
+await update.message.reply_text(f"Broadcast completed: {successful_sends}/{total_users} users successfully contacted. {blocked_users} users were blocked.")
 
     # Send a summary message to the owner
     await update.message.reply_text(
