@@ -229,6 +229,9 @@ async def getpvt(update: Update, context: CallbackContext) -> None:
         )
 
 
+# Initialize dictionaries for storing last used times
+user_last_getpublic_time = {}
+
 async def getpublic(update: Update, context: CallbackContext, collection=None) -> None:
     """Handles fetching random group links with a 10-second delay for repeated use."""
     if collection is None:
@@ -273,15 +276,16 @@ async def getpublic(update: Update, context: CallbackContext, collection=None) -
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         await update.message.reply_text(
-            "Here are the random group links:\n\n"
-            "Note: After 10 seconds, you can use the command again.",
+            "Tʜɪs ɪs Tʜᴇ 𝟷𝟶 ʀᴀɴᴅᴏᴍ ɢʀᴏᴜᴘ ʟɪɴᴋs\n\n"
+            "Nᴏᴛᴇ ᴀғᴛᴇʀ 𝟷𝟶 sᴇᴄ ᴛʜᴇɴ ᴜsᴇ /getpublic ᴄᴏᴍᴍᴀɴᴅ\n\n"
+            "Bᴇᴄᴀᴜsᴇ ᴏғ Tᴇᴀᴍ Sᴀɴᴋɪ ᴘᴏʟɪᴄʏ",
             reply_markup=reply_markup
         )
     else:
         await update.message.reply_text(
             "No group links available at the moment. Please try again later."
         )
-
+      
 async def broadcast(update: Update, context: CallbackContext) -> None:
     """Owner-only command to send a broadcast message to all users."""
     if update.message.from_user.id != int(OWNER_TELEGRAM_ID):
