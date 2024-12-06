@@ -48,19 +48,16 @@ def get_uptime():
     return f"{days} days, {hours} hours, {minutes} minutes, {seconds} seconds"
 
 async def start(update: Update, context: CallbackContext) -> None:
-    """Sends an attractive welcome message with a photo when the bot is started, and logs to the logger group."""
+    """Sends an attractive welcome message with a photo and inline buttons in a single message."""
 
     # Attractive welcome message with a photo
+    photo_url = "https://graph.org/file/6c0db28a848ed4dacae56-93b1bc1873b2494eb2.jpg"  # Replace with actual photo URL
     welcome_text = (
         "*🎉 Welcome to Our Bot, {user_name}! 🎉*\n\n"
         "Hello, *{user_name}* 👋\n\n"
         "If you want to promote your group then /req <msg> <link> and send.\n\n"
-        "🔹 Click below to access support or contact the owner directly!\n\n"
+        "🔹 Tap below to access support or contact the owner directly!\n\n"
     ).format(user_name=update.message.from_user.first_name)
-
-    # Send welcome message with a single photo
-    photo_url = "https://graph.org/file/6c0db28a848ed4dacae56-93b1bc1873b2494eb2.jpg"  # Replace with actual photo URL
-    await update.message.reply_photo(photo=photo_url, caption=welcome_text, parse_mode='Markdown')
 
     # Create an inline keyboard with links to support and the owner
     keyboard = [
@@ -69,8 +66,8 @@ async def start(update: Update, context: CallbackContext) -> None:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Send the inline keyboard message
-    await update.message.reply_text('Tap below to get support or contact the owner:', reply_markup=reply_markup)
+    # Send the photo with the caption and inline buttons
+    await update.message.reply_photo(photo=photo_url, caption=welcome_text, parse_mode='Markdown', reply_markup=reply_markup)
 
     # Log the user who started the bot
     user_name = update.message.from_user.first_name
@@ -277,7 +274,7 @@ async def getpublic(update: Update, context: CallbackContext) -> None:
 
         await update.message.reply_text(
             "Tʜɪs ɪs Tʜᴇ 𝟷𝟶 ʀᴀɴᴅᴏᴍ ɢʀᴏᴜᴘ ʟɪɴᴋs\n\n"
-            "Nᴏᴛᴇ ᴀғᴛᴇʀ 𝟷𝟶 sᴇᴄ ᴛʜᴇɴ ᴜsᴇ /getpvt ᴄᴏᴍᴍᴀɴᴅ\n\n"
+            "Nᴏᴛᴇ ᴀғᴛᴇʀ 𝟷𝟶 sᴇᴄ ᴛʜᴇɴ ᴜsᴇ /getpublic ᴄᴏᴍᴍᴀɴᴅ\n\n"
             "Bᴇᴄᴀᴜsᴇ ᴏғ Tᴇᴀᴍ Sᴀɴᴋɪ ᴘᴏʟɪᴄʏ",
             reply_markup=reply_markup
         )
