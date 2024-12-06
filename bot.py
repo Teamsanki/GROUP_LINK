@@ -64,8 +64,8 @@ async def start(update: Update, context: CallbackContext) -> None:
 
     # Create an inline keyboard with links to support and the owner
     keyboard = [
-        [InlineKeyboardButton("Sᴜᴘᴘᴏʀᴛ", url=OWNER_SUPPORT_CHANNEL)],
-        [InlineKeyboardButton("Oᴡɴᴇʀ", url=f"tg://user?id={OWNER_TELEGRAM_ID}")]
+        [InlineKeyboardButton("🌹ᏕᏬᎮᎮᎧᏒᏖ🌹", url=OWNER_SUPPORT_CHANNEL)],
+        [InlineKeyboardButton("😎ᏕᏗᏁᏦᎥ😎", url=f"tg://user?id={OWNER_TELEGRAM_ID}")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -92,15 +92,15 @@ async def help_command(update: Update, context: CallbackContext) -> None:
     help_text = (
         "*Available Commands:*\n\n"
         "*User Commands:*\n"
-        "1. /start - Start the bot\n"
+        "1. /getpublic - Get Random public group links\n"
         "2. /getpvt - Get random private group links\n"
         "3. /req <message> <link> - Send a request with your message and link to the owner\n\n"
     )
 
     keyboard = [
-        [InlineKeyboardButton("🛠 Contact Support", url=OWNER_SUPPORT_CHANNEL)],
-        [InlineKeyboardButton("💬 Message Owner", url=f"tg://user?id={OWNER_TELEGRAM_ID}")],
-        [InlineKeyboardButton("Back", callback_data="back")]
+        [InlineKeyboardButton("🌹ᏕᏬᎮᎮᎧᏒᏖ🌹", url=OWNER_SUPPORT_CHANNEL)],
+        [InlineKeyboardButton("😎ᏕᏗᏁᏦᎥ😎", url=f"tg://user?id={OWNER_TELEGRAM_ID}")],
+        [InlineKeyboardButton("◀️𝐁𝐀𝐂𝐊◀️", callback_data="back")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
