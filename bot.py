@@ -229,8 +229,12 @@ async def getpvt(update: Update, context: CallbackContext) -> None:
         )
 
 
-async def getpublic(update: Update, context: CallbackContext, collection) -> None:
+async def getpublic(update: Update, context: CallbackContext, collection=None) -> None:
     """Handles fetching random group links with a 10-second delay for repeated use."""
+    if collection is None:
+        # Provide a default collection (you can adjust this based on your use case)
+        collection = public_groups_collection
+    
     user_id = update.message.from_user.id
     current_time = datetime.now()
 
