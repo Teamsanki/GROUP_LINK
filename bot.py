@@ -229,14 +229,16 @@ async def getpvt(update: Update, context: CallbackContext) -> None:
         )
 
 
-async def getpublic(update: Update, context: CallbackContext) -> None:
-    """Fetches random public group links with a 10-second delay for repeated use."""
+async def getpublic(update: Update, context: CallbackContext, collection) -> None:
+    """Handles fetching random group links with a 10-second delay for repeated use."""
     user_id = update.message.from_user.id
     current_time = datetime.now()
 
     # Check if the user has used the command before
-    if user_id in user_last_getpublic_time:
-        last_used_time = user_last_getpublic_time[user_id]
+    user_last_time = user_last_getpublic_time if collection == public_groups_collection else user_last_getpvt_time
+
+    if user_id in user_last_time:
+        last_used_time = user_last_time[user_id]
         time_diff = (current_time - last_used_time).total_seconds()
 
         # If the command is used within 10 seconds, send a delay message
@@ -247,25 +249,19 @@ async def getpublic(update: Update, context: CallbackContext) -> None:
             return
 
     # Update the last used time for the user
-    user_last_getpublic_time[user_id] = current_time
+    user_last_time[user_id] = current_time
 
-    # Fetch all public group links from the database
-    group_links = public_groups_collection.find()
-    group_links_list = list(group_links)
-
-    # Filter out invalid links
-    valid_links = [link for link in group_links_list if is_valid_url(link.get('link', ''))]
+    # Fetch group links using the shared function
+    valid_links = get_random_group_links(collection)
 
     if len(valid_links) > 0:
-        # Ensure we only sample the number of links available
         sample_size = min(10, len(valid_links))
         random_links = random.sample(valid_links, sample_size)
 
-        # Dynamically create the keyboard based on the number of links
         keyboard = []
-        for i in range(0, len(random_links), 5):  # Create rows with 5 buttons each
+        for i in range(0, len(random_links), 5):
             row = [
-                InlineKeyboardButton(f"Puʙʟɪᴄ Gᴄ{i + j + 1}", url=random_links[i + j]['link'])
+                InlineKeyboardButton(f"Gc{i + j + 1}", url=random_links[i + j]['link'])
                 for j in range(min(5, len(random_links) - i))
             ]
             keyboard.append(row)
@@ -273,14 +269,13 @@ async def getpublic(update: Update, context: CallbackContext) -> None:
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         await update.message.reply_text(
-            "Tʜɪs ɪs Tʜᴇ 𝟷𝟶 ʀᴀɴᴅᴏᴍ ᴘᴜʙʟɪᴄ ɢʀᴏᴜᴘ ʟɪɴᴋs\n\n"
-            "Nᴏᴛᴇ ᴀғᴛᴇʀ 𝟷𝟶 sᴇᴄ ᴛʜᴇɴ ᴜsᴇ /getpublic ᴄᴏᴍᴍᴀɴᴅ\n\n"
-            "Bᴇᴄᴀᴜsᴇ ᴏғ Tᴇᴀᴍ Sᴀɴᴋɪ ᴘᴏʟɪᴄʏ",
+            "Here are the random group links:\n\n"
+            "Note: After 10 seconds, you can use the command again.",
             reply_markup=reply_markup
         )
     else:
         await update.message.reply_text(
-            "Nᴏ ᴘᴜʙʟɪᴄ ɢʀᴏᴜᴘ ʟɪɴᴋs ᴀᴠᴀɪʟᴀʙʟᴇ ʏᴇᴛ. Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ"
+            "No group links available at the moment. Please try again later."
         )
 
 async def broadcast(update: Update, context: CallbackContext) -> None:
