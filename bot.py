@@ -487,11 +487,10 @@ def main():
     application.add_handler(CommandHandler("for", for_command))
     application.add_handler(CommandHandler("stats", stats))
     application.add_handler(CommandHandler("addgc", addgc))
-    application.add_handler(CommandHandler("addpublic", addpublic))
+    application.add_handler(CommandHandler("addpl", addpl))
     application.add_handler(CommandHandler("getpublic", getpublic))
     application.add_handler(CommandHandler("delpl", delpl))
     application.add_handler(CommandHandler("delgc", delgc))
-    application.add_handler(CommandHandler("shift", shift))
 
     # Run the bot
     application.run_polling()
