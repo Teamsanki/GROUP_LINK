@@ -21,7 +21,7 @@ MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retry
 LOGGER_GROUP_CHAT_ID = "-1002100433415"
 
 # Replace with your support channel link and owner's Telegram ID
-OWNER_SUPPORT_CHANNEL = "https://t.me/matalbi_duniya"
+OWNER_SUPPORT_CHANNEL = "https://t.me/Teamsankinetworkk"
 OWNER_TELEGRAM_ID = "7877197608"
 
 # MongoDB Client and Database
