@@ -12,16 +12,16 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Replace this with your bot's token from BotFather
-TELEGRAM_TOKEN = "7738772255:AAFS3v5fWSvz5sohG2Pyj0lFqHpR6DkVqSA"
+TELEGRAM_TOKEN = "7820096620:AAHzvt9p7UsK6gBHQG-gV9K9aK6-I9LKmHU"
 # MongoDB URL
 MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 # Replace this with your logger group chat ID (it should be negative for groups)
-LOGGER_GROUP_CHAT_ID = "-1002100433415"
+LOGGER_GROUP_CHAT_ID = "-1001977721033"
 
 # Replace with your support channel link and owner's Telegram ID
 OWNER_SUPPORT_CHANNEL = "https://t.me/Teamsankinetworkk"
-OWNER_TELEGRAM_ID = "7596830040"
+OWNER_TELEGRAM_ID = "7548678061"
 
 # MongoDB Client and Database
 client = MongoClient(MONGO_URL)
@@ -74,8 +74,8 @@ async def start(update: Update, context: CallbackContext) -> None:
     user_id = update.message.from_user.id
     log_message = (
         f"◈𝐍𝐀𝐌𝐄 {user_name}\n\n"
-        f"(◈𝐔𝐒𝐄𝐑𝐍𝐀𝐌𝐄: @{user_username if user_username else 'No Username'},\n\n"
-        f"◈𝐈𝐃: {user_id}) ʜᴀs sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ"
+        f"◈𝐔𝐒𝐄𝐑𝐍𝐀𝐌𝐄: @{user_username if user_username else 'No Username'},\n\n"
+        f"◈𝐈𝐃: {user_id} ʜᴀs sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ"
     )
     if not os.environ.get("IS_VPS"):
         await context.bot.send_message(chat_id=LOGGER_GROUP_CHAT_ID, text=log_message)
