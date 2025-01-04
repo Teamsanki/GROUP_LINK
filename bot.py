@@ -17,11 +17,11 @@ TELEGRAM_TOKEN = "8076871013:AAEa3JtvY-XBcNGHXR2O_YyvnU3bQOjz8pA"
 MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 # Replace this with your logger group chat ID (it should be negative for groups)
-LOGGER_GROUP_CHAT_ID = "-1001977721033"
+LOGGER_GROUP_CHAT_ID = "-1002209942333"
 
 # Replace with your support channel link and owner's Telegram ID
 OWNER_SUPPORT_CHANNEL = "https://t.me/Teamsankinetworkk"
-OWNER_TELEGRAM_ID = "7912035011"
+OWNER_TELEGRAM_ID = "7548678061"
 
 # MongoDB Client and Database
 client = MongoClient(MONGO_URL)
