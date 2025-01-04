@@ -21,7 +21,7 @@ LOGGER_GROUP_CHAT_ID = "-1001977721033"
 
 # Replace with your support channel link and owner's Telegram ID
 OWNER_SUPPORT_CHANNEL = "https://t.me/Teamsankinetworkk"
-OWNER_TELEGRAM_ID = "7548678061"
+OWNER_TELEGRAM_ID = "7912035011"
 
 # MongoDB Client and Database
 client = MongoClient(MONGO_URL)
