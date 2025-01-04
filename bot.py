@@ -12,7 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Replace this with your bot's token from BotFather
-TELEGRAM_TOKEN = "7820096620:AAHzvt9p7UsK6gBHQG-gV9K9aK6-I9LKmHU"
+TELEGRAM_TOKEN = "8076871013:AAEa3JtvY-XBcNGHXR2O_YyvnU3bQOjz8pA"
 # MongoDB URL
 MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
