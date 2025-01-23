@@ -12,16 +12,16 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Replace this with your bot's token from BotFather
-TELEGRAM_TOKEN = "8076871013:AAEa3JtvY-XBcNGHXR2O_YyvnU3bQOjz8pA"
+TELEGRAM_TOKEN = "7894936433:AAGB6DUCC13t_a9I5YaBTk_3-xpuiH5mNiU"
 # MongoDB URL
 MONGO_URL = "mongodb+srv://Teamsanki:Teamsanki@cluster0.jxme6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 # Replace this with your logger group chat ID (it should be negative for groups)
-LOGGER_GROUP_CHAT_ID = "-1002209942333"
+LOGGER_GROUP_CHAT_ID = "-1002148651992"
 
 # Replace with your support channel link and owner's Telegram ID
 OWNER_SUPPORT_CHANNEL = "https://t.me/Teamsankinetworkk"
-OWNER_TELEGRAM_ID = "7912035011"
+OWNER_TELEGRAM_ID = "7548678061"
 
 # MongoDB Client and Database
 client = MongoClient(MONGO_URL)
